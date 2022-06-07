@@ -2,7 +2,7 @@ import { model, Schema } from "mongoose";
 import { OrderInterface } from "../interfaces/Order.interface";
 
 // Create a Schema corresponding to the document interface.
-const userSchema = new Schema<OrderInterface>(
+const orderSchema = new Schema<OrderInterface>(
     {
         price: { type: Number, required: true },
         orderName: { type: String, required: true },
@@ -16,4 +16,4 @@ const userSchema = new Schema<OrderInterface>(
 );
 
 // Create a Model.
-export const Order = model<OrderInterface>("Order", userSchema);
+export const Order = model<OrderInterface>("Order", orderSchema);
