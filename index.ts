@@ -3,6 +3,7 @@ import * as express from "express";
 import mongoose from "mongoose";
 import * as nodemailer from "nodemailer";
 import { Order } from "./Model/Order.Model";
+import { Product } from "./Model/Product.Model";
 import { OrderValidationSchema } from "./Validation/Order.validate";
 
 dotenv.config();
@@ -84,6 +85,14 @@ app.post("/order", async (req: express.Request, res: express.Response) => {
         const newOrder = new Order(data);
 
         const order = await newOrder.save();
+
+        const newProduct = new Product({
+            name: data.orderName,
+            quantity: data.orderQuantity,
+            price: data.price,
+        });
+
+        const product = await newProduct.save();
 
         // mail options
         const mailOptions = {
