@@ -116,6 +116,20 @@ app.delete(
     }
 );
 
+app.delete("/orders", async (req: express.Request, res: express.Response) => {
+    try {
+        const orders = await Order.deleteMany({ email: req.query.email });
+
+        res.status(200).json({
+            message: "Order deleted",
+            success: true,
+            orders,
+        });
+    } catch (error) {
+        res.json({ message: error.message });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`server is running at http://localhost:${PORT}`);
     mongoose.connect(process.env.DATABASE_URL, {}, () => {
