@@ -1,11 +1,12 @@
 import * as dotenv from "dotenv";
 import * as express from "express";
+import { readFile } from "fs";
+import { marked } from "marked";
 import mongoose from "mongoose";
 import * as nodemailer from "nodemailer";
 import { Order } from "./Model/Order.Model";
 import { Product } from "./Model/Product.Model";
 import { OrderValidationSchema } from "./Validation/Order.validate";
-
 dotenv.config();
 
 // app initialize
@@ -25,7 +26,15 @@ const transporter = nodemailer.createTransport({
 });
 
 app.get("/", (req: express.Request, res: express.Response) => {
-    res.json({ message: "hello" });
+    const path = __dirname + "/README.md";
+    console.log(path);
+    readFile(path, "utf8", function (err, data) {
+        if (err) {
+            console.log(err);
+            res.json({ err });
+        }
+        res.send(marked(data.toString()));
+    });
 });
 
 // get all orders by filter
