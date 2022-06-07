@@ -99,6 +99,23 @@ app.post("/order", async (req: express.Request, res: express.Response) => {
     }
 });
 
+app.delete(
+    "/orders/:id",
+    async (req: express.Request, res: express.Response) => {
+        try {
+            const order = await Order.findByIdAndDelete(req.params.id);
+
+            res.status(200).json({
+                message: "Order deleted",
+                success: true,
+                order,
+            });
+        } catch (error) {
+            res.json({ message: error.message });
+        }
+    }
+);
+
 app.listen(PORT, () => {
     console.log(`server is running at http://localhost:${PORT}`);
     mongoose.connect(process.env.DATABASE_URL, {}, () => {
