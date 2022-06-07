@@ -15,6 +15,20 @@ app.get("/", (req: express.Request, res: express.Response) => {
     res.json({ message: "hello" });
 });
 
+app.get("/products", async (req: express.Request, res: express.Response) => {
+    try {
+        const products = await Product.find({});
+
+        res.status(200).json({
+            message: "All products",
+            success: true.valueOf,
+            products,
+        });
+    } catch (error) {
+        res.json({ message: error.message });
+    }
+});
+
 app.post("/product", async (req: express.Request, res: express.Response) => {
     try {
         const data = await productValidationSchema.validate(req.body, {
