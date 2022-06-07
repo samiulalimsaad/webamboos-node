@@ -110,6 +110,34 @@ app.post("/order", async (req: express.Request, res: express.Response) => {
     }
 });
 
+// update order status by specific id
+app.patch(
+    "/orders/:id",
+    async (req: express.Request, res: express.Response) => {
+        try {
+            // update status to 'Done'
+            const order = await Order.findByIdAndUpdate(
+                req.params.id,
+                {
+                    $set: {
+                        status: "Done",
+                    },
+                },
+                {
+                    new: true,
+                }
+            );
+            res.status(200).json({
+                message: "Order deleted",
+                success: true,
+                order,
+            });
+        } catch (error) {
+            res.json({ message: error.message });
+        }
+    }
+);
+
 // delete order by specific id
 app.delete(
     "/orders/:id",
