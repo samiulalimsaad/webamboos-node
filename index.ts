@@ -32,24 +32,28 @@ app.get("/", (req: express.Request, res: express.Response) => {
 app.get("/orders", async (req: express.Request, res: express.Response) => {
     try {
         const priceFrom = req.query.priceFrom || 0;
-        const priceTo = req.query.priceTo || 999999999999;
+        const priceTo = req.query.priceTo || Infinity;
 
         const dateFrom = new Date("11/11/2019").toLocaleDateString();
         const date: any = req.query.dateTo;
+
+        const tempDate = new Date().toLocaleDateString().split("/");
+        tempDate[2] = tempDate[2] + 1;
         const dateTo = date
             ? new Date(date).toLocaleDateString()
-            : new Date().toLocaleDateString();
+            : tempDate.join("/");
 
         // filter orders by criteria
-        const Orders = await Order.find({
+        const orders = await Order.find({
             price: { $gte: priceFrom, $lte: priceTo },
             createdAt: { $gte: dateFrom, $lte: dateTo },
         });
 
         res.status(200).json({
-            message: "All Orders",
+            message: "All orders",
             success: true,
-            Orders,
+            orders,
+            dateTo,
         });
     } catch (error) {
         res.json({ message: error.message });
