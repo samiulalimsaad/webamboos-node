@@ -29,6 +29,23 @@ app.get("/products", async (req: express.Request, res: express.Response) => {
     }
 });
 
+app.get(
+    "/products/:id",
+    async (req: express.Request, res: express.Response) => {
+        try {
+            const product = await Product.findById(req.params.id);
+
+            res.status(200).json({
+                message: "products",
+                success: true.valueOf,
+                product,
+            });
+        } catch (error) {
+            res.json({ message: error.message });
+        }
+    }
+);
+
 app.post("/product", async (req: express.Request, res: express.Response) => {
     try {
         const data = await productValidationSchema.validate(req.body, {
