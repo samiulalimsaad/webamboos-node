@@ -2,8 +2,8 @@ import * as dotenv from "dotenv";
 import * as express from "express";
 import mongoose from "mongoose";
 import * as nodemailer from "nodemailer";
-import { Product } from "./Model/Product.model";
-import { productValidationSchema } from "./Validation/Product.validate";
+import { Order } from "./Model/Order.Model";
+import { OrderValidationSchema } from "./Validation/Order.validate";
 
 dotenv.config();
 
@@ -24,56 +24,53 @@ app.get("/", (req: express.Request, res: express.Response) => {
     res.json({ message: "hello" });
 });
 
-app.get("/products", async (req: express.Request, res: express.Response) => {
+app.get("/orders", async (req: express.Request, res: express.Response) => {
     try {
-        const products = await Product.find({});
+        const Orders = await Order.find({});
 
         res.status(200).json({
-            message: "All products",
+            message: "All Orders",
             success: true.valueOf,
-            products,
+            Orders,
         });
     } catch (error) {
         res.json({ message: error.message });
     }
 });
 
-app.get(
-    "/products/:id",
-    async (req: express.Request, res: express.Response) => {
-        try {
-            const product = await Product.findById(req.params.id);
-
-            res.status(200).json({
-                message: "products",
-                success: true.valueOf,
-                product,
-            });
-        } catch (error) {
-            res.json({ message: error.message });
-        }
-    }
-);
-
-app.post("/product", async (req: express.Request, res: express.Response) => {
+app.get("/orders/:id", async (req: express.Request, res: express.Response) => {
     try {
-        const data = await productValidationSchema.validate(req.body, {
+        const order = await Order.findById(req.params.id);
+
+        res.status(200).json({
+            message: "Orders",
+            success: true.valueOf,
+            Order,
+        });
+    } catch (error) {
+        res.json({ message: error.message });
+    }
+});
+
+app.post("/order", async (req: express.Request, res: express.Response) => {
+    try {
+        const data = await OrderValidationSchema.validate(req.body, {
             abortEarly: false,
         });
 
         data.status = "Inserted";
 
-        const newProduct = new Product(data);
+        const newOrder = new Order(data);
 
-        const product = await newProduct.save();
+        const order = await newOrder.save();
 
         const mailOptions = {
             from: "samiulalimsaad@gmail.com",
-            to: product.email,
-            subject: "Product purchase successfully",
-            html: `<h3>Hi ${product.email},</h3>
-                    <p>thank you for purchase The product</p>
-                    <p>you paid ${product.price} for ${product.productName}.</p>
+            to: order.email,
+            subject: "Order purchase successfully",
+            html: `<h3>Hi ${order.email},</h3>
+                    <p>thank you for purchase The order</p>
+                    <p>you paid ${order.price} for ${order.orderName} Quantity ${order.orderQuantity}.</p>
                     <p>Thank You</p>`,
         };
 
@@ -82,7 +79,7 @@ app.post("/product", async (req: express.Request, res: express.Response) => {
             .then((res) => console.log("Successfully sent"))
             .catch((err) => console.log("Failed ", err));
 
-        res.status(200).json({ message: "Inserted", success: true, product });
+        res.status(200).json({ message: "Inserted", success: true, Order });
     } catch (error) {
         res.json({
             message: error.errors.length ? error.errors : error.message,

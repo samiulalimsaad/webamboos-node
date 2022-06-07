@@ -1,8 +1,8 @@
 // Create an interface representing a document in MongoDB.
-export interface ProductInterface {
+export interface OrderInterface {
     price: number;
-    productName: string;
-    productQuantity: Number;
+    orderName: string;
+    orderQuantity: Number;
     paymentMethod: string;
     address: string;
     email: string;
