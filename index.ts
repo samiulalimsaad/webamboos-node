@@ -7,9 +7,14 @@ import { OrderValidationSchema } from "./Validation/Order.validate";
 
 dotenv.config();
 
+// app initialize
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// global middleware
+app.use(express.json());
+
+// create a transporter for send mail
 const transporter = nodemailer.createTransport({
     service: "SendinBlue", // no need to set host or port etc.
     auth: {
@@ -18,16 +23,15 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-app.use(express.json());
-
 app.get("/", (req: express.Request, res: express.Response) => {
     res.json({ message: "hello" });
 });
 
+// get all orders by filter
 app.get("/orders", async (req: express.Request, res: express.Response) => {
     try {
         const priceFrom = req.query.priceFrom || 0;
-        const priceTo = req.query.priceTo || 99999999;
+        const priceTo = req.query.priceTo || 999999999999;
 
         const dateFrom = new Date("11/11/2019").toLocaleDateString();
         const date: any = req.query.dateTo;
@@ -35,9 +39,10 @@ app.get("/orders", async (req: express.Request, res: express.Response) => {
             ? new Date(date).toLocaleDateString()
             : new Date().toLocaleDateString();
 
+        // filter orders by criteria
         const Orders = await Order.find({
             price: { $gte: priceFrom, $lte: priceTo },
-            // createdAt: { $gte: dateFrom, $lte: dateTo },
+            createdAt: { $gte: dateFrom, $lte: dateTo },
         });
 
         res.status(200).json({
@@ -50,6 +55,7 @@ app.get("/orders", async (req: express.Request, res: express.Response) => {
     }
 });
 
+// get specific order
 app.get("/orders/:id", async (req: express.Request, res: express.Response) => {
     try {
         const order = await Order.findById(req.params.id);
@@ -57,25 +63,29 @@ app.get("/orders/:id", async (req: express.Request, res: express.Response) => {
         res.status(200).json({
             message: "Orders",
             success: true,
-            Order,
+            order,
         });
     } catch (error) {
         res.json({ message: error.message });
     }
 });
 
+// create a new order
 app.post("/order", async (req: express.Request, res: express.Response) => {
     try {
+        // validate the requested data
         const data = await OrderValidationSchema.validate(req.body, {
             abortEarly: false,
         });
 
+        // default value of status
         data.status = "Inserted";
 
         const newOrder = new Order(data);
 
         const order = await newOrder.save();
 
+        // mail options
         const mailOptions = {
             from: "samiulalimsaad@gmail.com",
             to: order.email,
@@ -86,6 +96,7 @@ app.post("/order", async (req: express.Request, res: express.Response) => {
                     <p>Thank You</p>`,
         };
 
+        // send mail
         await transporter
             .sendMail(mailOptions)
             .then((res) => console.log("Successfully sent"))
@@ -99,6 +110,7 @@ app.post("/order", async (req: express.Request, res: express.Response) => {
     }
 });
 
+// delete order by specific id
 app.delete(
     "/orders/:id",
     async (req: express.Request, res: express.Response) => {
@@ -116,6 +128,7 @@ app.delete(
     }
 );
 
+// delete order by specific email
 app.delete("/orders", async (req: express.Request, res: express.Response) => {
     try {
         const orders = await Order.deleteMany({ email: req.query.email });
@@ -130,6 +143,7 @@ app.delete("/orders", async (req: express.Request, res: express.Response) => {
     }
 });
 
+// app run
 app.listen(PORT, () => {
     console.log(`server is running at http://localhost:${PORT}`);
     mongoose.connect(process.env.DATABASE_URL, {}, () => {
