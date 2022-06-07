@@ -26,7 +26,19 @@ app.get("/", (req: express.Request, res: express.Response) => {
 
 app.get("/orders", async (req: express.Request, res: express.Response) => {
     try {
-        const Orders = await Order.find({});
+        const minPrice = req.query.minPrice || -Infinity;
+        const maxPrice = req.query.maxPrice || Infinity;
+
+        const minDate = new Date("11/11/2019").toLocaleDateString();
+        const date: any = req.query.maxDate;
+        const maxDate = date
+            ? new Date(date).toLocaleDateString()
+            : new Date().toLocaleDateString();
+
+        const Orders = await Order.find({
+            price: { $gte: minPrice, $lte: maxPrice },
+            createdAt: { $gte: minDate, $lte: maxDate },
+        });
 
         res.status(200).json({
             message: "All Orders",
@@ -79,7 +91,7 @@ app.post("/order", async (req: express.Request, res: express.Response) => {
             .then((res) => console.log("Successfully sent"))
             .catch((err) => console.log("Failed ", err));
 
-        res.status(200).json({ message: "Inserted", success: true, Order });
+        res.status(200).json({ message: "Inserted", success: true, order });
     } catch (error) {
         res.json({
             message: error.errors.length ? error.errors : error.message,
