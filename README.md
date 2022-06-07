@@ -1,5 +1,11 @@
 # webamboos-node
 
+## Run
+
+`npm install` / `yarn`
+
+`npm start` / `yarn start`
+
 ## GET `'/orders'`
 
 this api will return all orders based on these filters:
