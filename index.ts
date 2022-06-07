@@ -7,6 +7,8 @@ import * as nodemailer from "nodemailer";
 import { Order } from "./Model/Order.Model";
 import { Product } from "./Model/Product.Model";
 import { OrderValidationSchema } from "./Validation/Order.validate";
+
+// load env variables
 dotenv.config();
 
 // app initialize

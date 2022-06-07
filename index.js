@@ -45,6 +45,7 @@ var nodemailer = require("nodemailer");
 var Order_Model_1 = require("./Model/Order.Model");
 var Product_Model_1 = require("./Model/Product.Model");
 var Order_validate_1 = require("./Validation/Order.validate");
+// load env variables
 dotenv.config();
 // app initialize
 var app = express();
